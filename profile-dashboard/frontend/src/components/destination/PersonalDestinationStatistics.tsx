@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Button from "antd/lib/button";
 import Card from "antd/lib/card";
 import {personalFilter} from "@src/components/plugControl/types";
@@ -8,7 +8,7 @@ import Select from "antd/lib/select";
 import DatePicker from "antd/lib/date-picker";
 import CustomKeplerMap from "@src/components/common/CustomKeplerMap";
 import Table from "antd/lib/table";
-import {addDataToMap, updateMap, toggleSidePanel, removeDataset, wrapTo} from "kepler.gl/actions";
+import {addDataToMap, updateMap, removeDataset, wrapTo} from "kepler.gl/actions";
 import {store} from "@src/index";
 import {Input, Radio, Space} from "antd";
 import {get} from "@src/api";
@@ -37,8 +37,6 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
     const [personalDestinationData, setPersonalDestinationData] = useState([])
     const [personalValueData, setPersonalValueData] = useState("");
     const [personalSelectData, setPersonalSelectData] = useState("");
-    const [selectedDateValue, setSelectedDateValue] = useState(null);
-    const [selectedRangeValue, setSelectedRangeValue] = useState(null);
     const [formattedMonth, setFormattedMonth] = useState(null);
     const [formattedStartTime, setFormattedStartTime] = useState(null);
     const [formattedEndTime, setFormattedEndTime] = useState(null);
@@ -77,7 +75,6 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
         setpersonalTableLoading(true);
         get<[]>(`/api/location/destination/personal/?${queryString}`)
             .then((jsonData) => {
-                console.log(jsonData);
                 setPersonalDestinationData(jsonData);
                 const h3FormattedData = "geometry,Address,Rank,Count\n" + h3FormatData(jsonData)
                 addH3DataKepler(h3FormattedData);
@@ -167,6 +164,8 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
         const regex = /POLYGON\(\(\s*([^\s,]+)\s*([^\s,]+)\s*,/;
         const match = polygonString.match(regex);
 
+        console.log(match);
+
         if (match && match.length === 3) {
             const longitude = parseFloat(match[1]);
             const latitude = parseFloat(match[2]);
@@ -255,7 +254,6 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
                         {radioValue === 1 && (
                             <DatePicker
                                 className={"h3-margin"}
-                                defaultValue={selectedDateValue}
                                 onChange={onDatePickerChange}
                                 picker="month"
                             />
@@ -264,7 +262,6 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
                             <Space direction="vertical" size={12}>
                                 <RangePicker
                                     className={"h3-margin"}
-                                    defaultValue={selectedRangeValue}
                                     style={{
                                         width: '130%',
                                     }}
@@ -307,8 +304,6 @@ const PersonalDestinationStatistics = (props: Props): React.ReactElement => {
                                    onRow={(record, rowIndex) => {
                                        return {
                                            onClick: (event) => {
-                                               console.log(record.h3cell)
-                                               console.log(extractFirstCoordinate(record.h3cell))
                                                store.dispatch(updateMap(extractFirstCoordinate(record.h3cell)))
                                                //POLYGON((126.93589717564313 37.494333725241106, 126.93582319423624 37.494953747055895, 126.93522323352242 37.49523218787344, 126.93469726604606 37.49489060783676, 126.93477125639322 37.49427059326881, 126.93537120527665 37.493992151490716))
                                            }, // click row

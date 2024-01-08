@@ -2,7 +2,6 @@ package com.carrotins.backend.repository.location
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
-import com.uber.h3core.util.LatLng
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy::class)
 data class DestinationPersonalData(
